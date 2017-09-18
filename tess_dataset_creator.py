@@ -242,5 +242,8 @@ if status==200:
             except AttributeError as att_error:
                 print "Problem with the timezone of "+tess["name"]
                 print att_error
+            except TypeError as type_error:
+                print "Problem with the format of (lat,long) in " + tess["name"]
+                print type_error
 
 print "End"
