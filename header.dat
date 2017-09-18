@@ -8,19 +8,19 @@
 # Location name:
 # Position:
 # Local timezone:
-# Time Synchronization:
-# Moving / Stationary position: STATIONARY
+# Time Synchronization: timestamp added by STARS4ALL software
+# Moving / Stationary position:
 # Moving / Fixed look direction: FIXED
-# Number of channels:
+# Number of channels: 1
 # Filters per channel:
-# Measurement direction per channel:
-# Field of view:
-# Number of fields per line:
+# Measurement direction per channel: 0., 0.
+# Field of view: 17
+# Number of fields per line: 6
 # TESS MAC address:
 # TESS firmware version: 1.0
-# TESS cover offset value:
+# TESS cover offset value: 0.0
 # TESS zero point:
-# Comment:  This photometer has not been calibrated
+# Comment:
 # Comment:
 # Comment:
 # Comment:
