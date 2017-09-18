@@ -149,7 +149,7 @@ def fill_header(csvfile, tess):
         elif key == "mac":
             value = value + " " +tess["mac"]
         elif key == "zero_point":
-            value = value + " " +tess["zero_point"]
+            value = value + " " +str(tess["zero_point"])
 
         csvfile.write(value.encode('utf-8')+"\n")
 
@@ -204,6 +204,7 @@ reference_time = datetime.datetime.strptime("12:00:00", "%X").time()
 
 if status==200:
     for tess in list_photometers:
+        file_path = os.getenv('BASE_STORAGE_PATH', "")
         print "Processing tess "+tess["name"]
         if "latitude" in tess and "longitude" in tess:
             #print str(tess["latitude"])+" "+str(tess["longitude"])
