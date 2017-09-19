@@ -5,6 +5,8 @@ import argparse
 import os
 import datetime
 import pytz
+import logging
+import logging.config
 from tzwhere import tzwhere
 
 
@@ -16,9 +18,15 @@ list_photometers = []
 
 header = {}
 header_keys = []
-header_list = []
+#header_list = []
 
 file_path = os.getenv('BASE_STORAGE_PATH', "")
+
+#Load logging configuration file
+logging.config.fileConfig('config/logging.cfg') #logfile config
+
+logging.debug("DEBUG MODE")
+logging.debug("INFO MODE")
 
 with open("header.dat") as header_file:
     header_keys.append("definition")
@@ -126,10 +134,11 @@ with open("header.dat") as header_file:
     header_keys.append("end")
     header[header_keys[34]] = header_file.readline().rstrip()
 
-    header_list = map(lambda x:{x,header[x]},header_keys)
+    #header_list = map(lambda x:{x,header[x]},header_keys)
 
 
 def fill_header(csvfile, tess):
+    logging.debug("Loading headers")
     for key in header_keys:
         value = header[key]
         if key == "instrument_id":
@@ -152,7 +161,7 @@ def fill_header(csvfile, tess):
             value = value + " " +str(tess["zero_point"])
 
         csvfile.write(value.encode('utf-8')+"\n")
-
+        logging.debug(value.encode('utf-8'))
 
 def get_observations(tess, current, timezone):
     #Observations interval set up from 12:00 hours of the previous day to 12:00 of the present day,
@@ -194,9 +203,9 @@ else:
 
 previous_date = current_date-datetime.timedelta(1)
 
-print "Date set up to "+str(current_date)
+logging.info("Date set up to "+str(current_date))
 
-print "Geting list of photometers ..."
+logging.info("Geting list of photometers ...")
 
 status, list_photometers = get_photometers()
 
@@ -205,7 +214,7 @@ reference_time = datetime.datetime.strptime("12:00:00", "%X").time()
 if status==200:
     for tess in list_photometers:
         file_path = os.getenv('BASE_STORAGE_PATH', "")
-        print "Processing tess "+tess["name"]
+        logging.info("Processing tess "+tess["name"])
         if "latitude" in tess and "longitude" in tess:
             #print str(tess["latitude"])+" "+str(tess["longitude"])
             try:
@@ -230,7 +239,7 @@ if status==200:
                     csvfile = open(file, "w")
                     writer = csv.writer(csvfile, delimiter=';')
                     fill_header(csvfile, tess)
-                    print "Requesting observations for photometer " + tess["name"]
+                    logging.info("Requesting observations for photometer " + tess["name"])
                     status, observations = get_observations(tess, current_date, timezone)
 
                     for observation in observations:
@@ -238,13 +247,14 @@ if status==200:
                             datetime.datetime.strptime(observation["tstamp"], "%Y-%m-%dT%H:%M:%SZ"), timezone)
                         writer.writerow((observation["tstamp"][:-1], local_time, observation["tamb"],
                                          observation["tsky"], observation["freq"], observation["mag"]))
+                    logging.info("Observations of "+tess["name"]+" recorded in file "+file)
                 else:
-                    print "The update time has not been reached (12:00 in local time)"
+                    logging.info("The update time has not been reached (12:00 in local time)")
             except AttributeError as att_error:
-                print "Problem with the timezone of "+tess["name"]
-                print att_error
+                logging.error("Problem with the timezone of "+tess["name"])
+                logging.error(att_error)
             except TypeError as type_error:
-                print "Problem with the format of (lat,long) in " + tess["name"]
-                print type_error
+                logging.error("Problem with the format of (lat,long) in " + tess["name"])
+                logging.error(type_error)
 
 print "End"
